@@ -9,20 +9,20 @@ const CombatSportsHomepage = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Performance indicator simulation
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setLoadTime(prev => {
-                if (prev >= 100) {
-                    setIsLoading(false);
-                    clearInterval(timer);
-                    return 100;
-                }
-                return prev + 3;
-            });
-        }, 40);
+    // useEffect(() => {
+    //     const timer = setInterval(() => {
+    //         setLoadTime(prev => {
+    //             if (prev >= 100) {
+    //                 setIsLoading(false);
+    //                 clearInterval(timer);
+    //                 return 100;
+    //             }
+    //             return prev + 3;
+    //         });
+    //     }, 40);
 
-        return () => clearInterval(timer);
-    }, []);
+    //     return () => clearInterval(timer);
+    // }, []);
 
     // Featured products data with image placeholders
     const featuredProducts = [
@@ -124,24 +124,24 @@ const CombatSportsHomepage = () => {
         setCurrentSlide((prev) => (prev - 1 + featuredProducts.length) % featuredProducts.length);
     };
 
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-20 h-20 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-                    <h2 className="text-black text-2xl font-bold mb-3">Combat Elite</h2>
-                    <p className="text-gray-600 text-lg mb-4">Loading your gear...</p>
-                    <div className="w-80 bg-gray-200 rounded-full h-2">
-                        <div
-                            className="bg-red-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${loadTime}%` }}
-                        ></div>
-                    </div>
-                    <p className="text-gray-500 text-sm mt-3">{loadTime}% Complete</p>
-                </div>
-            </div>
-        );
-    }
+    // if (isLoading) {
+    //     return (
+    //         <div className="min-h-screen bg-white flex items-center justify-center">
+    //             <div className="text-center">
+    //                 <div className="w-20 h-20 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+    //                 <h2 className="text-black text-2xl font-bold mb-3">Combat Elite</h2>
+    //                 <p className="text-gray-600 text-lg mb-4">Loading your gear...</p>
+    //                 <div className="w-80 bg-gray-200 rounded-full h-2">
+    //                     <div
+    //                         className="bg-red-600 h-2 rounded-full transition-all duration-300"
+    //                         style={{ width: `${loadTime}%` }}
+    //                     ></div>
+    //                 </div>
+    //                 <p className="text-gray-500 text-sm mt-3">{loadTime}% Complete</p>
+    //             </div>
+    //         </div>
+    //     );
+    // }
 
     return (
         <div className="min-h-screen bg-white text-black">
