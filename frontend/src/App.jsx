@@ -7,38 +7,69 @@ import Testimonials from "./pages/Testimonials";
 import Inquiry from "./pages/Inquiry";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminOrders from "./pages/AdOrders";
+import UserLayout from "./layout/UserLayout";
+import AdminLayout from "./layout/AdminLayout";
+
 import "./App.css";
-// Protect admin routes
-const ProtectedRoute = ({ isAllowed, children }) => {
-  if (!isAllowed) {
-    return <Navigate to="/" replace />;
+
+import { useEffect } from "react";
+
+function ProtectedRoute({ children }) {
+  const { authUser, isCheckingAuth } = useAuthStore();
+
+  if (isCheckingAuth) {
+    return <div className="text-center mt-10">Checking auth...</div>;
   }
+
+  if (!authUser || authUser.role !== "admin") {
+    return <Navigate to="/admin-login" replace />;
+  }
+
   return children;
-};
+}
 
 function App() {
-  const isAdmin = useAuthStore((state) => state.authUser?.role === "admin");
+  const { checkAuth } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   return (
     <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<HomePage />} />
-      <Route path="/products" element={<ProductCatalog />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/testimonials" element={<Testimonials />} />
-      <Route path="/inquiry" element={<Inquiry />} />
+      {/* Public / User Routes */}
+      <Route path="/" element={<UserLayout><HomePage /></UserLayout>} />
+      <Route path="/products" element={<UserLayout><ProductCatalog /></UserLayout>} />
+      <Route path="/about" element={<UserLayout><About /></UserLayout>} />
+      <Route path="/testimonials" element={<UserLayout><Testimonials /></UserLayout>} />
+      <Route path="/inquiry" element={<UserLayout><Inquiry /></UserLayout>} />
+
       <Route path="/admin-login" element={<AdminLogin />} />
 
-      {/* Admin Routes (Protected) */}
+      {/* Admin Routes */}
       <Route
         path="/admin-dashboard"
         element={
-          <ProtectedRoute isAllowed={isAdmin}>
-            <AdminDashboard />
+          <ProtectedRoute>
+            <AdminLayout>
+              <AdminDashboard />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/orders"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <AdminOrders />
+            </AdminLayout>
           </ProtectedRoute>
         }
       />
     </Routes>
+
   );
 }
 

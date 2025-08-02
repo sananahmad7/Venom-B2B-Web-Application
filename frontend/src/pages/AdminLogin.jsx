@@ -17,8 +17,10 @@ const AdminLogin = () => {
             return alert("Email and password are required");
         }
 
-        await login({ email, password });
-        //navigate("/admin-dashboard");
+        const success = await login({ email, password });
+        if (success) {
+            navigate("/admin-dashboard");
+        }
     };
 
     const togglePasswordVisibility = () => {
