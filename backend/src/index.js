@@ -5,7 +5,7 @@ import { connectDB } from "./libs/db.js"; // Make sure the file extension is inc
 import authRoutes from "./routes/auth.route.js";
 import cookieParser from "cookie-parser";
 import productRoutes from "./routes/product.route.js";
-
+import orderRoutes from "./routes/order.route.js";
 // Load environment variables
 dotenv.config();
 
@@ -25,6 +25,7 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
 
 // Sample route (optional, to test)
 app.get("/", (req, res) => {
