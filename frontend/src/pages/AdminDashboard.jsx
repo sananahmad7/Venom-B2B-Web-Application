@@ -1,37 +1,6 @@
-import React, { useState } from 'react';
-import { LogOut, Home, Users, Package, BarChart3, Settings, Shield, Menu, X } from 'lucide-react';
-import { useAuthStore } from '../store/useAuthStore';
-import { useNavigate } from 'react-router-dom';
+
 function AdminDashboard() {
-    const navigate = useNavigate();
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const { logout } = useAuthStore();
-    const handleLogout = async () => {
-        try {
-            // Replace this with your actual zustand store logout function
-            // Example: useAuthStore.getState().logout();
 
-            // For now, we'll simulate the logout process
-            console.log('Logging out...');
-            logout();
-            // In your actual implementation, navigate to home page after logout
-            //navigate('/');
-        } catch (error) {
-            console.error('Logout error:', error);
-        }
-    };
-
-    const handleNavigation = (path) => {
-        console.log(`Navigating to: ${path}`);
-        navigate(path);
-        alert(`Would navigate to: ${path}`);
-        // Close mobile menu after navigation
-        setIsMobileMenuOpen(false);
-    };
-
-    const toggleMobileMenu = () => {
-        setIsMobileMenuOpen(!isMobileMenuOpen);
-    };
 
     return (
         <div className="min-h-screen bg-gray-100">

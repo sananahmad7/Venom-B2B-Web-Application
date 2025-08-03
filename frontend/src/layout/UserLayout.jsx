@@ -13,24 +13,25 @@ function UserLayout({ children }) {
                         {/* Logo */}
                         <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
-                                <span className="text-white font-bold text-lg">CE</span>
+                                <span className="text-white font-bold text-lg">V</span>
                             </div>
                             <Link to="/" className="text-2xl font-bold text-black hidden sm:block">
-                                COMBAT ELITE
+                                Venom
                             </Link>
                         </div>
 
                         {/* Desktop Links */}
                         <div className="hidden lg:flex items-center space-x-8">
+                            <Link to="/" className="text-gray-700 hover:text-red-600 font-medium transition-colors">
+                                Home
+                            </Link>
                             <Link to="/products" className="text-gray-700 hover:text-red-600 font-medium transition-colors">
                                 Catalog
                             </Link>
                             <Link to="/about" className="text-gray-700 hover:text-red-600 font-medium transition-colors">
                                 About
                             </Link>
-                            <Link to="/testimonials" className="text-gray-700 hover:text-red-600 font-medium transition-colors">
-                                Testimonials
-                            </Link>
+
                             <Link to="/inquiry" className="text-gray-700 hover:text-red-600 font-medium transition-colors">
                                 B2B Inquiry
                             </Link>

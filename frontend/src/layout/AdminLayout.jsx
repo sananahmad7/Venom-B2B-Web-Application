@@ -36,6 +36,9 @@ function AdminLayout({ children }) {
                         <Link to="/admin/orders" className="hover:text-red-400">
                             Orders
                         </Link>
+                        <Link to="/admin/products" className="hover:text-red-400">
+                            Products
+                        </Link>
                         <button
                             onClick={handleLogout}
                             className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm font-medium"
