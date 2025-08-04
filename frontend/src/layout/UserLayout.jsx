@@ -61,6 +61,9 @@ function UserLayout({ children }) {
                     {isMobileMenuOpen && (
                         <div className="lg:hidden border-t border-gray-200 py-4 bg-white rounded-b-xl">
                             <div className="flex flex-col space-y-4">
+                                <Link to="/" className="text-gray-700 hover:text-red-600 font-medium px-2 py-1 rounded-lg hover:bg-gray-50">
+                                    Home
+                                </Link>
                                 <Link
                                     to="/products"
                                     className="text-gray-700 hover:text-red-600 font-medium px-2 py-1 rounded-lg hover:bg-gray-50"
@@ -73,12 +76,7 @@ function UserLayout({ children }) {
                                 >
                                     About
                                 </Link>
-                                <Link
-                                    to="/testimonials"
-                                    className="text-gray-700 hover:text-red-600 font-medium px-2 py-1 rounded-lg hover:bg-gray-50"
-                                >
-                                    Testimonials
-                                </Link>
+
                                 <Link
                                     to="/inquiry"
                                     className="text-gray-700 hover:text-red-600 font-medium px-2 py-1 rounded-lg hover:bg-gray-50"
