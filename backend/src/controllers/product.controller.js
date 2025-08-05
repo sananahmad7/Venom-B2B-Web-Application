@@ -1,11 +1,5 @@
 import Product from "../models/product.model.js";
-import { v2 as cloudinary } from "cloudinary";
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+import cloudinary from "../libs/cloudinary.js";
 
 export const createProduct = async (req, res) => {
   try {
@@ -28,11 +22,11 @@ export const createProduct = async (req, res) => {
 
     let cloudinaryResponse = null;
 
-    // if (image) {
-    //   cloudinaryResponse = await cloudinary.uploader.upload(image, {
-    //     folder: "products",
-    //   });
-    // }
+    if (image) {
+      cloudinaryResponse = await cloudinary.uploader.upload(image, {
+        folder: "products",
+      });
+    }
 
     const newProduct = new Product({
       name,

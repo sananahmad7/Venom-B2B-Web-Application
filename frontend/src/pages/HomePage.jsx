@@ -1,80 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Search, ShoppingCart, Play, Users, Trophy, Star, Zap, Menu, X, Building2, Globe, Package } from 'lucide-react';
+import useProductStore from '../store/useProductStore.jsx'; // Adjust path as needed
 
 const VenumB2BHomepage = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [loadTime, setLoadTime] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [featuredProducts, setFeaturedProducts] = useState([]);
-    const [loading, setLoading] = useState(false);
 
-    // Mock featured products for demonstration
-    const mockFeaturedProducts = [
-        {
-            _id: '1',
-            name: 'Venum Challenger Boxing Gloves',
-            category: 'Boxing',
-            price: 45.99,
-            image: 'https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=400&h=400&fit=crop&crop=center',
-            isNew: true
-        },
-        {
-            _id: '2',
-            name: 'Venum Elite MMA Shorts',
-            category: 'MMA',
-            price: 32.50,
-            image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop&crop=center',
-            isNew: false
-        },
-        {
-            _id: '3',
-            name: 'Venum Elite BJJ Gi',
-            category: 'BJJ',
-            price: 89.99,
-            image: 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=400&h=400&fit=crop&crop=center',
-            isNew: false
-        }
-    ];
-
-    // Improved fetch featured products function with better error handling
-    const getFeaturedProducts = async () => {
-        setLoading(true);
-        try {
-            // Check if we're in development mode or if the API endpoint exists
-            const response = await fetch('/api/products/featured');
-
-            if (response.ok) {
-                const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    const data = await response.json();
-                    setFeaturedProducts(data);
-                    console.log("Featured products:", data);
-                } else {
-                    // If response is not JSON (likely HTML error page), use mock data
-                    console.warn('API returned non-JSON response, using mock data');
-                    setFeaturedProducts(mockFeaturedProducts);
-                }
-            } else {
-                console.warn('API request failed, using mock data');
-                setFeaturedProducts(mockFeaturedProducts);
-            }
-        } catch (error) {
-            console.error('Error fetching featured products:', error);
-            // Use mock data as fallback
-            setFeaturedProducts(mockFeaturedProducts);
-        } finally {
-            setLoading(false);
-        }
-    };
+    // Get featured products from Zustand store
+    const { featuredProducts, loading, getFeaturedProducts } = useProductStore();
 
     // Fetch featured products on component mount
     useEffect(() => {
         getFeaturedProducts();
-        // Simulate loading completion
-        const timer = setTimeout(() => setIsLoading(false), 1000);
-        return () => clearTimeout(timer);
-    }, []);
+    }, [getFeaturedProducts]);
 
     // Product categories for B2B
     const categories = [
@@ -131,27 +71,23 @@ const VenumB2BHomepage = () => {
     ];
 
     const nextSlide = () => {
-        if (featuredProducts.length > 0) {
-            setCurrentSlide((prev) => (prev + 1) % featuredProducts.length);
-        }
+        setCurrentSlide((prev) => (prev + 1) % featuredProducts.length);
     };
 
     const prevSlide = () => {
-        if (featuredProducts.length > 0) {
-            setCurrentSlide((prev) => (prev - 1 + featuredProducts.length) % featuredProducts.length);
-        }
+        setCurrentSlide((prev) => (prev - 1 + featuredProducts.length) % featuredProducts.length);
     };
 
     // Helper function to format price for B2B display
     const formatB2BPrice = (price) => {
-        if (!price || isNaN(price)) return "Price on Request";
-        return `From $${Number(price).toFixed(2)}`;
+        if (typeof price !== "number") return "Price on Request";
+        return `From $${price.toFixed(2)}`;
     };
+
 
     // Helper function to get retail price (assuming 40% markup for display)
     const getRetailPrice = (wholesalePrice) => {
-        if (!wholesalePrice || isNaN(wholesalePrice)) return "Contact for Pricing";
-        return `Retail: $${(Number(wholesalePrice) * 1.4).toFixed(2)}`;
+        return `Retail: $${(wholesalePrice * 1.4).toFixed(2)}`;
     };
 
     // Helper function to get minimum order quantity
@@ -167,18 +103,6 @@ const VenumB2BHomepage = () => {
         return moqMap[category] || 'Min. Order: 25 units';
     };
 
-    // Loading screen
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <div className="text-white text-xl font-bold">Loading Venum B2B...</div>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="min-h-screen bg-white text-black">
             {/* Performance Indicator */}
@@ -186,61 +110,14 @@ const VenumB2BHomepage = () => {
                 <div className="h-full bg-red-600 w-full"></div>
             </div>
 
-            {/* Navigation Bar */}
-            <nav className="fixed top-1 left-0 w-full bg-black/90 backdrop-blur-md z-40 border-b border-gray-800">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="flex items-center justify-between h-16">
-                        <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
-                                <span className="text-white font-bold text-lg">V</span>
-                            </div>
-                            <span className="text-xl font-black text-white">VENUM B2B</span>
-                        </div>
-
-                        <div className="hidden md:flex items-center space-x-8">
-                            <a href="#categories" className="text-gray-300 hover:text-white transition-colors">Categories</a>
-                            <a href="#products" className="text-gray-300 hover:text-white transition-colors">Products</a>
-                            <a href="#partnership" className="text-gray-300 hover:text-white transition-colors">Partnership</a>
-                            <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
-                                Request Catalog
-                            </button>
-                        </div>
-
-                        <button
-                            className="md:hidden text-white"
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        >
-                            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                        </button>
-                    </div>
-                </div>
-
-                {/* Mobile Menu */}
-                {isMobileMenuOpen && (
-                    <div className="md:hidden bg-black border-t border-gray-800">
-                        <div className="px-4 py-4 space-y-4">
-                            <a href="#categories" className="block text-gray-300 hover:text-white transition-colors">Categories</a>
-                            <a href="#products" className="block text-gray-300 hover:text-white transition-colors">Products</a>
-                            <a href="#partnership" className="block text-gray-300 hover:text-white transition-colors">Partnership</a>
-                            <button className="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
-                                Request Catalog
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </nav>
-
             {/* Hero Section */}
             <section className="relative h-screen bg-gradient-to-br from-black via-zinc-900 to-black flex items-center justify-center overflow-hidden">
                 {/* Background Pattern */}
                 <div className="absolute inset-0">
                     <img
-                        src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1920&h=1080&fit=crop&crop=center"
+                        src="/ok.jpg"
                         alt="Combat sports training facility"
                         className="absolute inset-0 w-full h-full object-cover opacity-30"
-                        onError={(e) => {
-                            e.target.style.display = 'none';
-                        }}
                     />
                 </div>
 
@@ -249,7 +126,7 @@ const VenumB2BHomepage = () => {
                 <div className="absolute bottom-0 left-0 w-1/4 h-1/2 bg-gradient-to-tr from-white/5 to-transparent"></div>
 
                 {/* Hero Content */}
-                <div className="relative z-10 max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center pt-16">
+                <div className="relative z-10 max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-12 items-center">
                     <div className="text-left">
                         <div className="mb-4">
                             <span className="text-red-600 font-semibold text-sm tracking-wider uppercase">Wholesale Partners</span>
@@ -283,7 +160,7 @@ const VenumB2BHomepage = () => {
                         <div className="relative">
                             <div className="w-80 h-96 bg-gradient-to-br from-gray-800 to-gray-700 rounded-2xl shadow-2xl overflow-hidden">
                                 <img
-                                    src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=400&h=500&fit=crop&crop=center"
+                                    src="/gym.jpg"
                                     alt="Venum professional equipment"
                                     className="w-full h-full object-cover"
                                     onError={(e) => {
@@ -304,7 +181,7 @@ const VenumB2BHomepage = () => {
             </section>
 
             {/* Product Categories Grid */}
-            <section id="categories" className="py-20 bg-gray-50">
+            <section className="py-20 bg-gray-50">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="mb-16">
                         <h2 className="text-4xl font-black mb-4 text-black">Wholesale Product Categories</h2>
@@ -345,7 +222,7 @@ const VenumB2BHomepage = () => {
             </section>
 
             {/* Company Stats & Partnership */}
-            <section id="partnership" className="py-20 bg-black">
+            <section className="py-20 bg-black">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="text-center mb-16">
                         <div className="flex items-center justify-center space-x-6 mb-8">
@@ -376,7 +253,7 @@ const VenumB2BHomepage = () => {
             </section>
 
             {/* Featured Products Section */}
-            <section id="products" className="py-20 bg-white">
+            <section className="py-20 bg-white">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="flex justify-between items-center mb-12">
                         <div>
@@ -522,6 +399,15 @@ const VenumB2BHomepage = () => {
                             <a href="#" className="text-gray-500 hover:text-red-600 text-sm transition-colors">Privacy Policy</a>
                             <a href="#" className="text-gray-500 hover:text-red-600 text-sm transition-colors">Terms of Service</a>
                             <a href="#" className="text-gray-500 hover:text-red-600 text-sm transition-colors">Distributor Agreement</a>
+
+                            {/* Admin Login (Discreet Link) */}
+                            <a
+                                href="/admin-login"
+                                className="text-[10px] text-gray-300 hover:text-red-500 transition-colors hidden md:inline-block"
+                                title="Admin Access"
+                            >
+                                Admin
+                            </a>
                         </div>
                     </div>
                 </div>
