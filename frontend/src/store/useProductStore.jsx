@@ -6,6 +6,7 @@ const useProductStore = create((set, get) => ({
     products: [],
     isLoading: false,
     isCreating: false,
+    featuredProducts: [],
 
     // Create Product
     createProduct: async (productData) => {
@@ -67,6 +68,19 @@ const useProductStore = create((set, get) => ({
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to update product");
             return false;
+        }
+    },
+    getFeaturedProducts: async () => {
+        set({ loading: true });
+        try {
+            console.log("Fetching featured products...");
+            const res = await axiosInstance.get("products/featured");
+            set({ featuredProducts: res.data, loading: false });
+            console.log("Fetching featured back...");
+
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Error fetching featured products");
+            set({ loading: false });
         }
     },
 }));

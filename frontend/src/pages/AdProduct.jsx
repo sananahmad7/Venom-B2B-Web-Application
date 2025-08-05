@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Package, Upload, Star, Trash2, Edit, Loader2 } from 'lucide-react';
+import { Plus, Package, Upload, Star, Trash2, Edit, Loader2, X } from 'lucide-react';
 import useProductStore from '../store/useProductStore';
 
 // Move CreateProductForm outside of the main component
@@ -8,7 +8,10 @@ const CreateProductForm = React.memo(({
     handleInputChange,
     handleSubmit,
     isCreating,
-    categories
+    categories,
+    selectedImage,
+    handleImageChange,
+    removeImage
 }) => (
     <div className="bg-white rounded-lg p-8 max-w-2xl mx-auto shadow-lg">
         <h2 className="text-2xl font-bold text-red-600 mb-8 text-center">Create New Product</h2>
@@ -124,14 +127,39 @@ const CreateProductForm = React.memo(({
 
             <div>
                 <label className="block text-gray-700 text-sm font-medium mb-4">Product Image</label>
-                <button
-                    type="button"
-                    className="flex items-center gap-2 px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 hover:border-red-500 transition-colors"
-                    disabled
-                >
-                    <Upload size={20} />
-                    Upload Image (Coming Soon)
-                </button>
+                {selectedImage ? (
+                    <div className="relative">
+                        <img
+                            src={selectedImage}
+                            alt="Product preview"
+                            className="w-full h-48 object-cover rounded-lg border border-gray-300"
+                        />
+                        <button
+                            type="button"
+                            onClick={removeImage}
+                            className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1 hover:bg-red-700 transition-colors"
+                        >
+                            <X size={16} />
+                        </button>
+                    </div>
+                ) : (
+                    <div>
+                        <input
+                            type="file"
+                            id="image-upload"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="hidden"
+                        />
+                        <label
+                            htmlFor="image-upload"
+                            className="flex items-center gap-2 px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 hover:border-red-500 transition-colors cursor-pointer"
+                        >
+                            <Upload size={20} />
+                            Upload Image
+                        </label>
+                    </div>
+                )}
             </div>
 
             <button
@@ -200,8 +228,16 @@ const ProductsList = React.memo(({
                             <tr key={product._id} className="hover:bg-gray-50 transition-colors">
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
-                                        <div className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center border border-gray-300">
-                                            <Package size={24} className="text-gray-500" />
+                                        <div className="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center border border-gray-300 overflow-hidden">
+                                            {product.image ? (
+                                                <img
+                                                    src={product.image}
+                                                    alt={product.name}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <Package size={24} className="text-gray-500" />
+                                            )}
                                         </div>
                                         <div className="ml-4">
                                             <div className="text-sm font-medium text-gray-900">{product.name}</div>
@@ -279,6 +315,7 @@ const AdProduct = () => {
         availableStock: '',
         sku: ''
     });
+    const [selectedImage, setSelectedImage] = useState(null);
 
     const {
         products,
@@ -296,6 +333,52 @@ const AdProduct = () => {
     useEffect(() => {
         getAllProducts();
     }, [getAllProducts]);
+
+    // Helper function to convert file to base64
+    const convertToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (error) => reject(error);
+        });
+    };
+
+    // Handle image selection
+    const handleImageChange = useCallback(async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file');
+                return;
+            }
+
+            // Validate file size (5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image size should be less than 5MB');
+                return;
+            }
+
+            try {
+                const base64 = await convertToBase64(file);
+                setSelectedImage(base64);
+            } catch (error) {
+                console.error('Error converting image:', error);
+                alert('Error processing image');
+            }
+        }
+    }, []);
+
+    // Remove selected image
+    const removeImage = useCallback(() => {
+        setSelectedImage(null);
+        // Reset the file input
+        const fileInput = document.getElementById('image-upload');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+    }, []);
 
     // Memoize event handlers to prevent unnecessary re-renders
     const handleInputChange = useCallback((e) => {
@@ -331,6 +414,7 @@ const AdProduct = () => {
                 unitPrice: parseFloat(formData.packagePrice),
             },
             availableStock: parseInt(formData.availableStock) || 0,
+            image: selectedImage || "", // Include the base64 image
         };
 
         const success = await createProduct(productData);
@@ -345,10 +429,16 @@ const AdProduct = () => {
                 availableStock: '',
                 sku: ''
             });
+            // Reset image
+            setSelectedImage(null);
+            const fileInput = document.getElementById('image-upload');
+            if (fileInput) {
+                fileInput.value = '';
+            }
             // Switch to products tab
             setActiveTab('products');
         }
-    }, [formData, createProduct, setActiveTab]);
+    }, [formData, selectedImage, createProduct, setActiveTab]);
 
     const handleDelete = useCallback(async (productId) => {
         if (window.confirm('Are you sure you want to delete this product?')) {
@@ -401,6 +491,9 @@ const AdProduct = () => {
                         handleSubmit={handleSubmit}
                         isCreating={isCreating}
                         categories={categories}
+                        selectedImage={selectedImage}
+                        handleImageChange={handleImageChange}
+                        removeImage={removeImage}
                     />
                 )}
                 {activeTab === 'products' && (
