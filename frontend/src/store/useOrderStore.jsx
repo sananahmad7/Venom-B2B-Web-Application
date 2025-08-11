@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { toast } from "react-hot-toast";
-import axiosInstance from "../lib/axios";
+import { axiosInstance } from "../lib/axios";
 
 const useOrderStore = create((set, get) => ({
     // State
@@ -134,3 +134,5 @@ const useOrderStore = create((set, get) => ({
         set({ currentOrder: null });
     },
 }));
+
+export default useOrderStore
